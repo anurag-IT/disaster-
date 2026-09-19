@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { normalizeNepalPhone } from "@/lib/phone";
-import { responders as initialResponders } from "@/data/seed";
+import { responders as initialResponders, seedIncidents } from "@/data/seed";
 import { useIncidents } from "@/hooks/useIncidents";
 import type { Incident, PriorityLevel, Responder, TranscriptLine } from "@/types/incident";
 
@@ -302,7 +302,7 @@ const liveCalls = [
 export function CommandDashboard() {
   // Supabase integration - auto-fetches incidents
   const { 
-    incidents, 
+    incidents: dbIncidents,  // Rename to avoid collision
     loading: incidentsLoading, 
     error: incidentsError, 
     isUsingDemoData,
@@ -328,12 +328,18 @@ export function CommandDashboard() {
   const [showAreaCall,  setShowAreaCall]  = useState(false);
   const [areaCallMsg,   setAreaCallMsg]   = useState("");
 
+  // All hooks MUST be called before any conditional returns
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  // If no incidents from Supabase, use demo data
+  const incidents = dbIncidents.length > 0 ? dbIncidents : seedIncidents;
   const selected = incidents.find(i => i.id === selectedId) ?? incidents[0];
+  
+  // Show warning banner if using fallback demo data
+  const showDemoFallback = dbIncidents.length === 0 && !isUsingDemoData;
 
   const metrics = useMemo(() => ({
     critical:   incidents.filter(i => i.priorityLevel === "CRITICAL REVIEW").length,
@@ -353,7 +359,59 @@ export function CommandDashboard() {
         areaPolygon
       );
     });
-  }, [areaPolygon, incidents]);
+  }, [incidents, areaPolygon]);
+
+  function startCall() {
+    const phone_num = normalizeNepalPhone(phone);
+    if (!phone_num) {
+      setError("Invalid Nepal mobile number");
+      return;
+    }
+    setCall("CALLING"); setStep(1); setSelectedId(1042); setTab("TRANSCRIPT");
+    setTimeout(() => { setCall("CONNECTED"); setStep(2); }, 900);
+  }
+
+  useEffect(() => {
+    if (mode !== "DEMO" || call !== "CONNECTED" || step !== 2) return;
+    const t = [
+      setTimeout(() => setStep(3), 1100),
+      setTimeout(() => setStep(4), 2600),
+      setTimeout(() => setStep(5), 4100),
+      setTimeout(() => setStep(6), 5600),
+    ];
+    return () => t.forEach(clearTimeout);
+  }, [mode, call, step]);
+
+  const transcript = selected && selected.transcript ? (
+    selected.id === 1042 && step > 0
+      ? selected.transcript.slice(0, Math.max(0, step - 1))
+      : selected.transcript
+  ) : [];
+
+  function assign(team: Responder) {
+    setTeams(ts => ts.map(t => t.id === team.id ? { ...t, status: "ASSIGNED" } : t));
+    setIncidents(xs => xs.map(i => i.id === selected.id
+      ? { ...i, assignedTeam: team.name, status: "TEAM_ASSIGNED" } : i));
+  }
+  
+  // NOW check loading state AFTER all hooks
+  if (incidentsLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        background: '#0a0e1a',
+        color: '#fff',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
+        <div style={{ fontSize: '2rem' }}>⏳</div>
+        <div>Loading Raksha Dashboard...</div>
+      </div>
+    );
+  }
 
   async function startCall() {
     setError("");
@@ -389,8 +447,8 @@ export function CommandDashboard() {
   }, [mode, call, step]);
 
   const transcript = selected.id === 1042 && step > 0
-    ? selected.transcript.slice(0, Math.max(0, step - 1))
-    : selected.transcript;
+    ? (selected.transcript || []).slice(0, Math.max(0, step - 1))
+    : (selected.transcript || []);
 
   function assign(team: Responder) {
     setTeams(ts => ts.map(t => t.id === team.id ? { ...t, status: "ASSIGNED" } : t));
@@ -467,7 +525,7 @@ export function CommandDashboard() {
         <div className="topbar-sep" />
         <div className="header-system">
           <h1>Disaster Command Centre</h1>
-          {isUsingDemoData && (
+          {(isUsingDemoData || showDemoFallback) && (
             <div style={{ 
               fontSize: 10, 
               color: "rgba(255,203,0,0.9)", 
@@ -475,7 +533,9 @@ export function CommandDashboard() {
               fontWeight: 600,
               letterSpacing: "0.5px"
             }}>
-              ⚠ DEMO MODE - Using simulated data
+              {showDemoFallback 
+                ? "⚠ No data in Supabase - Using demo incidents" 
+                : "⚠ DEMO MODE - Using simulated data"}
             </div>
           )}
           {incidentsLoading && (

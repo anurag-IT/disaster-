@@ -12,7 +12,7 @@ export function useIncidents() {
     async function fetchIncidents() {
       // If Supabase not configured, use seed data
       if (!isSupabaseConfigured) {
-        console.log('Using seed data (Supabase not configured)');
+        console.log('📊 Using seed data (Supabase not configured)');
         setIncidents(seedIncidents);
         setLoading(false);
         return;
@@ -20,91 +20,78 @@ export function useIncidents() {
 
       try {
         setLoading(true);
+        console.log('🔄 Fetching incidents from Supabase...');
         
         const { data, error: fetchError } = await supabase!
-          .from('Incident')
-          .select(`
-            *,
-            call:Call(
-              id,
-              callSid,
-              phoneHash,
-              status,
-              startedAt,
-              endedAt
-            ),
-            evidence:IncidentEvidence(*),
-            assignments:Assignment(
-              *,
-              responder:Responder(*)
-            )
-          `)
-          .order('createdAt', { ascending: false });
+          .from('incidents')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-        if (fetchError) throw fetchError;
+        if (fetchError) {
+          console.error('❌ Supabase fetch error:', fetchError);
+          throw fetchError;
+        }
+
+        console.log('✅ Fetched from Supabase:', data?.length || 0, 'incidents');
 
         // Transform Supabase data to match Incident type
-        const transformedIncidents: Incident[] = (data || []).map((item: any) => ({
-          id: item.id,
-          phoneMasked: item.call?.phoneHash ? `+977****${item.call.phoneHash.slice(-4)}` : 'Unknown',
-          status: item.status,
-          createdAt: item.createdAt,
-          simulated: item.simulated,
-          priorityScore: item.priorityScore,
-          priorityLevel: item.priorityLevel,
-          priorityReasons: item.data?.priorityReasons || [],
+        const transformedIncidents: Incident[] = (data || []).map((item: any) => {
+          const incidentData = item.data || {};
           
-          // Extract from JSON data field
-          peopleCount: item.data?.peopleCount ?? null,
-          trapped: item.data?.trapped ?? null,
-          canEvacuate: item.data?.canEvacuate ?? null,
-          seriousInjury: item.data?.seriousInjury ?? null,
-          childrenCount: item.data?.childrenCount ?? null,
-          elderlyCount: item.data?.elderlyCount ?? null,
-          mobilityImpaired: item.data?.mobilityImpaired ?? null,
-          waterRising: item.data?.waterRising ?? null,
-          structuralDanger: item.data?.structuralDanger ?? null,
-          injuredCount: item.data?.injuredCount ?? null,
-          pregnantPerson: item.data?.pregnantPerson ?? null,
-          foodNeeded: item.data?.foodNeeded ?? null,
-          drinkingWaterNeeded: item.data?.drinkingWaterNeeded ?? null,
-          medicineNeeded: item.data?.medicineNeeded ?? null,
-          
-          location: item.data?.location || {
-            rawText: 'Unknown',
-            latitude: null,
-            longitude: null,
-            district: null,
-            municipality: null,
-            ward: null,
-            tole: null,
-            landmark: null,
-            accuracy: 'UNKNOWN'
-          },
-          
-          summary: item.data?.summary || '',
-          recommendedResponse: item.data?.recommendedResponse || [],
-          assignedTeam: item.assignments?.[0]?.responder?.name || null,
-          
-          evidence: (item.evidence || []).map((e: any) => ({
-            field: e.field,
-            value: typeof e.value === 'string' ? e.value : JSON.stringify(e.value),
-            quote: e.transcriptQuote,
-            confidence: e.confidence,
-            timestamp: e.createdAt
-          })),
-          
-          transcript: [] // Will be loaded separately if needed
-        }));
+          return {
+            id: item.id,
+            phoneMasked: incidentData.phoneMasked || 'Unknown',
+            status: item.status || 'NEW',
+            createdAt: item.created_at,
+            simulated: item.simulated || false,
+            priorityScore: item.priority_score || 0,
+            priorityLevel: item.priority_level || 'STANDARD',
+            priorityReasons: incidentData.priorityReasons || [],
+            
+            // Incident details from JSONB data field
+            peopleCount: incidentData.peopleCount ?? null,
+            trapped: incidentData.trapped ?? null,
+            canEvacuate: incidentData.canEvacuate ?? null,
+            seriousInjury: incidentData.seriousInjury ?? null,
+            childrenCount: incidentData.childrenCount ?? null,
+            elderlyCount: incidentData.elderlyCount ?? null,
+            mobilityImpaired: incidentData.mobilityImpaired ?? null,
+            waterRising: incidentData.waterRising ?? null,
+            structuralDanger: incidentData.structuralDanger ?? null,
+            injuredCount: incidentData.injuredCount ?? null,
+            pregnantPerson: incidentData.pregnantPerson ?? null,
+            foodNeeded: incidentData.foodNeeded ?? null,
+            drinkingWaterNeeded: incidentData.drinkingWaterNeeded ?? null,
+            medicineNeeded: incidentData.medicineNeeded ?? null,
+            
+            location: incidentData.location || {
+              rawText: 'Unknown',
+              latitude: null,
+              longitude: null,
+              district: null,
+              municipality: null,
+              ward: null,
+              tole: null,
+              landmark: null,
+              accuracy: 'UNKNOWN'
+            },
+            
+            summary: incidentData.summary || '',
+            recommendedResponse: incidentData.recommendedResponse || [],
+            assignedTeam: incidentData.assignedTeam || null,
+            evidence: incidentData.evidence || [],
+            transcript: incidentData.transcript || []
+          };
+        });
 
         setIncidents(transformedIncidents);
         setError(null);
       } catch (err) {
-        console.error('Error fetching incidents:', err);
+        console.error('❌ Error fetching incidents:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch incidents');
         
         // Fallback to seed data on error
-        console.log('Falling back to seed data due to error');
+        console.log('📊 Falling back to seed data due to error');
         setIncidents(seedIncidents);
       } finally {
         setLoading(false);
@@ -115,52 +102,25 @@ export function useIncidents() {
 
     // Subscribe to real-time updates if Supabase is configured
     if (isSupabaseConfigured) {
-      const subscription = supabase!
-        .channel('incidents')
+      console.log('🔔 Subscribing to real-time incident updates...');
+      
+      const channel = supabase!
+        .channel('incidents-changes')
         .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'Incident' }, 
-          () => {
-            console.log('Incident data changed, refetching...');
+          { event: '*', schema: 'public', table: 'incidents' }, 
+          (payload) => {
+            console.log('🔔 Real-time update:', payload);
             fetchIncidents();
           }
         )
         .subscribe();
 
       return () => {
-        subscription.unsubscribe();
+        console.log('🔕 Unsubscribing from real-time updates');
+        channel.unsubscribe();
       };
     }
   }, []);
-
-  const addIncident = async (incident: Omit<Incident, 'id'>) => {
-    if (!isSupabaseConfigured) {
-      // Add to local state only
-      const newIncident = { ...incident, id: Math.max(...incidents.map(i => i.id), 0) + 1 };
-      setIncidents(prev => [newIncident, ...prev]);
-      return newIncident;
-    }
-
-    try {
-      const { data, error } = await supabase!
-        .from('Incident')
-        .insert({
-          callId: 'temp-call-id', // Should be replaced with actual call ID
-          data: incident,
-          priorityScore: incident.priorityScore,
-          priorityLevel: incident.priorityLevel,
-          status: incident.status,
-          simulated: incident.simulated
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      console.error('Error adding incident:', err);
-      throw err;
-    }
-  };
 
   const updateIncident = async (id: number, updates: Partial<Incident>) => {
     if (!isSupabaseConfigured) {
@@ -172,19 +132,32 @@ export function useIncidents() {
     }
 
     try {
+      // Get current incident data
+      const currentIncident = incidents.find(inc => inc.id === id);
+      if (!currentIncident) throw new Error('Incident not found');
+
+      // Merge updates with current data
+      const updatedData = {
+        ...currentIncident.data,
+        ...updates
+      };
+
       const { error } = await supabase!
-        .from('Incident')
+        .from('incidents')
         .update({
-          data: updates,
+          data: updatedData,
           status: updates.status,
-          priorityScore: updates.priorityScore,
-          priorityLevel: updates.priorityLevel
+          priority_score: updates.priorityScore,
+          priority_level: updates.priorityLevel,
+          updated_at: new Date().toISOString()
         })
         .eq('id', id);
 
       if (error) throw error;
+      
+      console.log('✅ Incident updated:', id);
     } catch (err) {
-      console.error('Error updating incident:', err);
+      console.error('❌ Error updating incident:', err);
       throw err;
     }
   };
@@ -193,8 +166,7 @@ export function useIncidents() {
     incidents,
     loading,
     error,
-    isUsingDemoData: !isSupabaseConfigured,
-    addIncident,
+    isUsingDemoData: !isSupabaseConfigured || incidents === seedIncidents,
     updateIncident,
     setIncidents // For local state management in demo mode
   };

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase Connection</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <button onclick="testConnection()">Test Connection</button>
+    <button onclick="fetchIncidents()">Fetch Incidents</button>
+    <button onclick="fetchResponders()">Fetch Responders</button>
+    <pre id="output"></pre>
+
+    <script>
+        const SUPABASE_URL = 'https://ezekbjgjukbhfjzbecxk.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6ZWtiamdqdWtiaGZqemJlY3hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MDg1NzcsImV4cCI6MjEwNTM4NDU3N30.ECavkTiS5bgC6eOqnaZyuKAuvNOfcMiDYQEZSKcVG-E';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += JSON.stringify(message, null, 2) + '\n\n';
+        }
+
+        async function testConnection() {
+            document.getElementById('output').textContent = 'Testing connection...\n\n';
+            try {
+                const { data, error } = await supabase
+                    .from('incidents')
+                    .select('count');
+                
+                if (error) {
+                    log({ status: 'ERROR', error: error.message });
+                } else {
+                    log({ status: 'SUCCESS', message: 'Connected to Supabase!' });
+                }
+            } catch (err) {
+                log({ status: 'ERROR', error: err.message });
+            }
+        }
+
+        async function fetchIncidents() {
+            document.getElementById('output').textContent = 'Fetching incidents...\n\n';
+            try {
+                const { data, error } = await supabase
+                    .from('incidents')
+                    .select('*');
+                
+                if (error) {
+                    log({ status: 'ERROR', error: error.message, details: error });
+                } else {
+                    log({ 
+                        status: 'SUCCESS', 
+                        count: data.length,
+                        incidents: data 
+                    });
+                }
+            } catch (err) {
+                log({ status: 'ERROR', error: err.message });
+            }
+        }
+
+        async function fetchResponders() {
+            document.getElementById('output').textContent = 'Fetching responders...\n\n';
+            try {
+                const { data, error } = await supabase
+                    .from('responders')
+                    .select('*');
+                
+                if (error) {
+                    log({ status: 'ERROR', error: error.message });
+                } else {
+                    log({ 
+                        status: 'SUCCESS', 
+                        count: data.length,
+                        responders: data 
+                    });
+                }
+            } catch (err) {
+                log({ status: 'ERROR', error: err.message });
+            }
+        }
+
+        // Auto test on load
+        window.onload = () => {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

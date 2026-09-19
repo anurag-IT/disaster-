@@ -74,7 +74,11 @@ export default function Sidebar({ open }: SidebarProps) {
 
       <div className="sidebar-footer">
         <div className="operator-profile">
-          <div className="operator-avatar">CS</div>
+          <img 
+            src="/constable-sharma.jpg" 
+            alt="Constable Sharma" 
+            className="operator-avatar-image"
+          />
           <div className="operator-info">
             <div className="operator-name">Constable Sharma</div>
             <div className="operator-role">Police Operator</div>

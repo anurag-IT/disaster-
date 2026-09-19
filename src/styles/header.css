@@ -323,6 +323,15 @@
   justify-content: center;
 }
 
+.operator-avatar-image-header {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--police-blue);
+  flex-shrink: 0;
+}
+
 .operator-info-mini {
   display: flex;
   flex-direction: column;

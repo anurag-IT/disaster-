@@ -155,7 +155,11 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         </div>
 
         <div className="operator-section">
-          <div className="operator-avatar-mini">CS</div>
+          <img 
+            src="/constable-sharma.jpg" 
+            alt="Constable Sharma" 
+            className="operator-avatar-image-header"
+          />
           <div className="operator-info-mini">
             <span className="operator-name">Constable Sharma</span>
             <span className="operator-role">Police Operator</span>

@@ -1,0 +1,95 @@
+.live-alerts {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+}
+
+.alerts-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background-color: var(--police-blue);
+  color: white;
+  border-color: var(--police-blue);
+}
+
+.alerts-table-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.live-alerts .table-header {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 100px 50px;
+  gap: 8px;
+  padding: 8px 10px;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.live-alerts .table-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 100px 50px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background-color: rgba(36, 45, 61, 0.4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.live-alerts .table-row:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.live-alerts .table-row.selected-row {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--police-blue);
+}
+
+.status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.status-pending { background-color: rgba(239, 68, 68, 0.2); color: var(--critical); }
+.status-assigned { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.status-on-the-way { background-color: rgba(234, 179, 8, 0.2); color: var(--medium); }
+.status-resolved { background-color: rgba(34, 197, 94, 0.2); color: var(--low); }

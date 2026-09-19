@@ -1,0 +1,307 @@
+.map-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 480px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.map-container.fullscreen-active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  border-radius: 0;
+}
+
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background-color: rgba(26, 35, 50, 0.95);
+  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 1000;
+}
+
+.map-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  flex: 1;
+  max-width: 320px;
+}
+
+.map-search input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 12px;
+  width: 100%;
+}
+
+.map-search input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.map-search svg {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.map-badge-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-tertiary);
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.live-dot {
+  color: #22c55e;
+  font-size: 10px;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.map-controls-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-type-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.map-type-btn:hover {
+  background-color: var(--border-color-light);
+  color: var(--text-primary);
+}
+
+.map-type-btn.active {
+  background-color: var(--police-blue);
+  border-color: var(--police-blue);
+  color: white;
+}
+
+.fullscreen-btn {
+  padding: 6px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.fullscreen-btn:hover {
+  background-color: var(--border-color-light);
+  color: var(--text-primary);
+}
+
+.map-body {
+  flex: 1;
+  position: relative;
+  background-color: #0b1120;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background: #0f172a !important;
+}
+
+.map-legends {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-item.critical { color: var(--critical); }
+.legend-item.high { color: var(--high); }
+.legend-item.medium { color: var(--medium); }
+.legend-item.low { color: var(--low); }
+.legend-item.police { color: var(--police-blue-light); }
+
+.map-provider-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background-color: rgba(15, 23, 42, 0.8);
+  color: var(--text-tertiary);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+}
+
+.map-footer {
+  padding: 6px 14px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  flex-shrink: 0;
+  z-index: 1000;
+}
+
+.map-info {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+}
+
+.info-item {
+  display: flex;
+  gap: 6px;
+}
+
+.info-item .label {
+  color: var(--text-tertiary);
+}
+
+.info-item .value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Leaflet Custom Marker & Popup Styles */
+.leaflet-custom-icon {
+  background: transparent;
+  border: none;
+}
+
+.pulse-red {
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulse-ring 1.8s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.incident-popup .leaflet-popup-content-wrapper {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  box-shadow: var(--shadow-md);
+}
+
+.incident-popup .leaflet-popup-tip {
+  background-color: var(--bg-secondary);
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+  min-width: 160px;
+}
+
+.popup-content h4 {
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.popup-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+  text-transform: uppercase;
+}
+
+.badge-critical { background-color: rgba(239, 68, 68, 0.25); color: var(--critical); }
+.badge-high { background-color: rgba(249, 115, 22, 0.25); color: var(--high); }
+.badge-medium { background-color: rgba(234, 179, 8, 0.25); color: var(--medium); }
+
+.popup-loc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.popup-select-btn {
+  margin-top: 4px;
+  padding: 4px 8px;
+  background-color: var(--police-blue);
+  color: white;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.popup-select-btn:hover {
+  background-color: var(--police-blue-dark);
+}

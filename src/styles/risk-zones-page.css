@@ -1,0 +1,270 @@
+.risk-zones-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.zones-count-tag {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.risk-cards-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+}
+
+.risk-zone-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.risk-border-critical { border-left: 4px solid var(--critical); }
+.risk-border-high { border-left: 4px solid var(--high); }
+.risk-border-medium { border-left: 4px solid var(--medium); }
+
+.rz-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: rgba(26, 35, 50, 0.8);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rz-id {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-tertiary);
+}
+
+.rz-card-header h3 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2px 0 0 0;
+}
+
+.rz-card-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.rz-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rz-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.rz-val {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.rz-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.police-st-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.st-acknowledged { background-color: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.st-monitoring { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.st-new { background-color: rgba(239, 68, 68, 0.2); color: var(--critical); }
+
+.rz-card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}
+
+.rz-btn {
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+}
+
+.btn-view-on-map {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-open-detail {
+  background-color: var(--police-blue);
+  color: white;
+}
+
+.btn-ack-zone {
+  background-color: #16a34a;
+  color: white;
+}
+
+.rz-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rz-detail-card {
+  width: 100%;
+  max-width: 540px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rz-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background-color: rgba(26, 35, 50, 0.95);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rz-modal-header h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2px 0 0 0;
+}
+
+.rz-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rz-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background-color: var(--bg-tertiary);
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+}
+
+.detail-item.full {
+  grid-column: 1 / -1;
+}
+
+.detail-item .lbl {
+  color: var(--text-tertiary);
+  font-weight: 700;
+}
+
+.detail-item .val {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.nearby-section h4 {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.units-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.u-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+.u-icon { color: var(--police-blue-light); }
+.u-st { margin-left: auto; font-weight: 700; color: #22c55e; font-size: 10px; }
+
+.rz-modal-footer {
+  padding: 12px 20px;
+  background-color: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  background-color: var(--police-blue);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

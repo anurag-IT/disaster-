@@ -1,0 +1,149 @@
+.teams-resources-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.cat-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cat-btn:hover {
+  color: var(--text-primary);
+}
+
+.cat-btn.active {
+  background-color: var(--police-blue);
+  color: white;
+  border-color: var(--police-blue);
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+}
+
+.resource-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.res-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background-color: rgba(26, 35, 50, 0.8);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.res-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.res-icon { flex-shrink: 0; }
+.res-icon.boat { color: #3b82f6; }
+.res-icon.radio { color: #f97316; }
+.res-icon.medical { color: #ef4444; }
+.res-icon.shelter { color: #8b5cf6; }
+.res-icon.team { color: #10b981; }
+
+.res-id {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-tertiary);
+}
+
+.res-title-group h3 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2px 0 0 0;
+}
+
+.res-status-tag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+
+}
+
+.st-available { background-color: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.st-deployed { background-color: rgba(249, 115, 22, 0.2); color: var(--high); }
+.st-low-stock { background-color: rgba(239, 68, 68, 0.2); color: var(--critical); }
+
+.res-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.count-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.metric-box {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-tertiary);
+  padding: 8px;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.m-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.m-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.avail-val { color: #22c55e; }
+.dep-val { color: var(--high); }
+.maint-val { color: var(--text-tertiary); }
+
+.allocation-progress-bar {
+  display: flex;
+  height: 6px;
+  background-color: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+}
+
+.deployed-fill { background-color: var(--high); }
+.available-fill { background-color: #22c55e; }

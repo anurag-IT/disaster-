@@ -1,0 +1,12 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+enum CallStatus { INITIATED RINGING CONNECTED COMPLETED FAILED }
+enum IncidentStatus { NEW ASSESSING TEAM_ASSIGNED RESOLVED }
+enum ResponderStatus { AVAILABLE ASSIGNED EN_ROUTE ON_SCENE UNAVAILABLE }
+model Call { id String @id @default(cuid()); callSid String? @unique @map("call_sid"); phoneHash String @map("phone_hash"); status CallStatus; startedAt DateTime @default(now()) @map("started_at"); endedAt DateTime? @map("ended_at"); transcripts Transcript[]; incident Incident? }
+model Transcript { id String @id @default(cuid()); callId String @map("call_id"); call Call @relation(fields:[callId],references:[id]); speaker String; text String; timestamp DateTime @default(now()) }
+model Incident { id Int @id @default(autoincrement()); callId String @unique @map("call_id"); call Call @relation(fields:[callId],references:[id]); data Json; priorityScore Int @default(0) @map("priority_score"); priorityLevel String @map("priority_level"); status IncidentStatus @default(NEW); simulated Boolean @default(false); createdAt DateTime @default(now()) @map("created_at"); updatedAt DateTime @updatedAt @map("updated_at"); evidence IncidentEvidence[]; assignments Assignment[]; updates IncidentUpdate[] }
+model IncidentEvidence { id String @id @default(cuid()); incidentId Int @map("incident_id"); incident Incident @relation(fields:[incidentId],references:[id]); field String; value Json; transcriptQuote String @map("transcript_quote"); confidence Float; createdAt DateTime @default(now()) @map("created_at") }
+model Responder { id String @id @default(cuid()); name String; type String; status ResponderStatus @default(AVAILABLE); latitude Float?; longitude Float?; assignments Assignment[] }
+model Assignment { id String @id @default(cuid()); incidentId Int @map("incident_id"); responderId String @map("responder_id"); incident Incident @relation(fields:[incidentId],references:[id]); responder Responder @relation(fields:[responderId],references:[id]); status String; assignedBy String @map("assigned_by"); createdAt DateTime @default(now()) @map("created_at") }
+model IncidentUpdate { id String @id @default(cuid()); incidentId Int @map("incident_id"); incident Incident @relation(fields:[incidentId],references:[id]); type String; message String; createdAt DateTime @default(now()) @map("created_at") }

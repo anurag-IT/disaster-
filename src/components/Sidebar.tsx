@@ -42,7 +42,11 @@ export default function Sidebar({ open }: SidebarProps) {
     <aside className={`sidebar ${open ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
         <div className="logo">
-          <Shield size={28} className="logo-icon" />
+          <img 
+            src="/Nepal_Police_logo.png" 
+            alt="Nepal Police Logo" 
+            className="logo-image"
+          />
           <div className="logo-text">
             <div className="logo-title">RAKSHA</div>
             <div className="logo-subtitle">Police Emergency Response</div>

@@ -29,9 +29,12 @@
   cursor: pointer;
 }
 
-.logo-icon {
-  color: var(--police-blue);
+.logo-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
   flex-shrink: 0;
+  filter: brightness(1.1) drop-shadow(0 0 2px rgba(37, 99, 235, 0.5));
 }
 
 .logo-text {

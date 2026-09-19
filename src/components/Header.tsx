@@ -60,6 +60,13 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <button className="menu-toggle" onClick={onToggleSidebar} title="Toggle Sidebar">
           <Menu size={20} />
         </button>
+        <div className="header-logo">
+          <img 
+            src="/Nepal_Police_logo.png" 
+            alt="Nepal Police Logo" 
+            className="header-logo-image"
+          />
+        </div>
         <div className="header-title">
           <h1>RAKSHA</h1>
           <p>AI-Powered Flood Emergency Command Center</p>

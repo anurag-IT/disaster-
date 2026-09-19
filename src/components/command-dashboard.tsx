@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { normalizeNepalPhone } from "@/lib/phone";
-import { responders as initialResponders, seedIncidents } from "@/data/seed";
+import { responders as initialResponders } from "@/data/seed";
+import { useIncidents } from "@/hooks/useIncidents";
 import type { Incident, PriorityLevel, Responder, TranscriptLine } from "@/types/incident";
 
 // Fix Leaflet default icon with Vite
@@ -299,7 +300,16 @@ const liveCalls = [
    ROOT COMPONENT
 ══════════════════════════════════════════════════════════════════ */
 export function CommandDashboard() {
-  const [incidents,     setIncidents]     = useState(seedIncidents);
+  // Supabase integration - auto-fetches incidents
+  const { 
+    incidents, 
+    loading: incidentsLoading, 
+    error: incidentsError, 
+    isUsingDemoData,
+    setIncidents,
+    updateIncident 
+  } = useIncidents();
+  
   const [selectedId,    setSelectedId]    = useState(1042);
   const [teams,         setTeams]         = useState(initialResponders);
   const [tab,           setTab]           = useState<"INTELLIGENCE" | "TRANSCRIPT">("INTELLIGENCE");
@@ -457,6 +467,22 @@ export function CommandDashboard() {
         <div className="topbar-sep" />
         <div className="header-system">
           <h1>Disaster Command Centre</h1>
+          {isUsingDemoData && (
+            <div style={{ 
+              fontSize: 10, 
+              color: "rgba(255,203,0,0.9)", 
+              marginTop: 2,
+              fontWeight: 600,
+              letterSpacing: "0.5px"
+            }}>
+              ⚠ DEMO MODE - Using simulated data
+            </div>
+          )}
+          {incidentsLoading && (
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>
+              Loading incidents...
+            </div>
+          )}
         </div>
         <div className="topbar-right">
           <div className="clock-block">

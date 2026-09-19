@@ -59,9 +59,116 @@ app.post("/api/calls/start", async (request, response) => {
 app.post("/api/twilio/voice", (request, response) => {
   if (!verifyTwilioRequest(request)) { response.status(403).send("Invalid Twilio signature"); return; }
   const voice = new twiml.VoiceResponse();
-  const wsUrl = process.env.WEBSOCKET_PUBLIC_URL;
-  if (wsUrl) voice.connect().stream({ url: wsUrl });
-  else { voice.say({ language: "en-IN" }, "Namaste. Raksha emergency assistance is temporarily unavailable. Please contact your local emergency services."); voice.hangup(); }
+  
+  // Get base URL for action URLs
+  const baseUrl = process.env.APP_URL || `${request.protocol}://${request.get("host")}`;
+  
+  // Start conversation - ask for name in Nepali
+  const gather = voice.gather({
+    input: ["speech"],
+    action: `${baseUrl}/api/twilio/gather-name`,
+    method: "POST",
+    timeout: 5,
+    speechTimeout: "auto",
+    language: "ne-NP"  // Nepali language for speech recognition
+  });
+  
+  // Using Hindi voice (Aditi) which is understood in Nepal
+  gather.say({ language: "hi-IN", voice: "Polly.Aditi" }, 
+    "नमस्ते! राक्षा आपतकालीन सेवामा स्वागत छ। कृपया तपाईंको नाम भन्नुहोस्?");
+  
+  // Fallback if no input
+  voice.say({ language: "hi-IN" }, "मैले कुनै इनपुट प्राप्त गरेन। कृपया फेरि कल गर्नुहोस्।");
+  voice.hangup();
+  
+  response.type("text/xml").send(voice.toString());
+});
+
+// Store conversation state in memory (in production, use database)
+const conversationState = new Map<string, { name?: string; age?: number }>();
+
+app.post("/api/twilio/gather-name", (request, response) => {
+  if (!verifyTwilioRequest(request)) { response.status(403).send("Invalid Twilio signature"); return; }
+  
+  const voice = new twiml.VoiceResponse();
+  const callSid = request.body.CallSid;
+  const speechResult = request.body.SpeechResult;
+  
+  console.log(`[${callSid}] Name received:`, speechResult);
+  
+  // Get base URL for action URLs
+  const baseUrl = process.env.APP_URL || `${request.protocol}://${request.get("host")}`;
+  
+  // Store name
+  if (!conversationState.has(callSid)) {
+    conversationState.set(callSid, {});
+  }
+  const state = conversationState.get(callSid)!;
+  state.name = speechResult;
+  
+  // Ask for age in Nepali
+  const gather = voice.gather({
+    input: ["speech", "dtmf"],
+    action: `${baseUrl}/api/twilio/gather-age`,
+    method: "POST",
+    timeout: 5,
+    speechTimeout: "auto",
+    numDigits: 3,
+    language: "ne-NP"  // Nepali language for speech recognition
+  });
+  
+  gather.say({ language: "hi-IN", voice: "Polly.Aditi" }, 
+    `धन्यवाद ${speechResult}। तपाईंको उमेर कति हो?`);
+  
+  voice.say({ language: "hi-IN" }, "मैले तपाईंको उमेर प्राप्त गरेन। कृपया फेरि कल गर्नुहोस्।");
+  voice.hangup();
+  
+  response.type("text/xml").send(voice.toString());
+});
+
+app.post("/api/twilio/gather-age", (request, response) => {
+  if (!verifyTwilioRequest(request)) { response.status(403).send("Invalid Twilio signature"); return; }
+  
+  const voice = new twiml.VoiceResponse();
+  const callSid = request.body.CallSid;
+  const speechResult = request.body.SpeechResult;
+  const digits = request.body.Digits;
+  
+  // Get age from speech or DTMF
+  const ageInput = digits || speechResult;
+  const age = parseInt(ageInput?.replace(/\D/g, "") || "0", 10);
+  
+  console.log(`[${callSid}] Age received:`, age);
+  
+  // Store age
+  const state = conversationState.get(callSid);
+  if (state) {
+    state.age = age;
+    
+    console.log(`[${callSid}] Complete details:`, state);
+    
+    // Confirm collected information in Nepali
+    voice.say({ language: "hi-IN", voice: "Polly.Aditi" }, 
+      `धन्यवाद ${state.name}। मैले नोट गरें कि तपाईं ${age} वर्षको हुनुहुन्छ। तपाईंको विवरण रेकर्ड गरिएको छ। आज हामी तपाईंलाई कसरी मद्दत गर्न सक्छौं?`);
+    
+    // Now connect to WebSocket for live conversation
+    const wsUrl = process.env.WEBSOCKET_PUBLIC_URL;
+    if (wsUrl) {
+      voice.say({ language: "hi-IN" }, "तपाईंलाई आपतकालीन सहायतामा जोड्दैछु।");
+      voice.connect().stream({ url: wsUrl });
+    } else {
+      voice.say({ language: "hi-IN" }, "कृपया बीप पछि आफ्नो आपतकालीन अवस्था बताउनुहोस्।");
+      voice.pause({ length: 1 });
+      voice.say({ language: "hi-IN" }, "कल गर्नुभएकोमा धन्यवाद। आपतकालीन सेवाहरूलाई सूचित गरिएको छ।");
+    }
+    
+    // Cleanup
+    conversationState.delete(callSid);
+  } else {
+    voice.say({ language: "hi-IN" }, "माफ गर्नुहोस्, तपाईंको जानकारी प्रशोधन गर्न त्रुटि भयो।");
+  }
+  
+  voice.hangup();
   response.type("text/xml").send(voice.toString());
 });
 

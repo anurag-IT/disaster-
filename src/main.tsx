@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { CommandDashboard } from "@/components/command-dashboard";
+import "leaflet/dist/leaflet.css";
 import "@/styles.css";
 
 const root = document.getElementById("root");
